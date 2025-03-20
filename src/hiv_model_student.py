@@ -15,16 +15,16 @@ def load_hiv_data(filename):
     try:
         data = np.loadtxt(filename)
         return data[:, 0], data[:, 1]
-    except:
-        return np.loadtxt(filenamepath, delimiter=',', unpack=False)
-# 定义HIV模型
-def HIV_model(t, A, alpha, B, beta):
-    return A * np.exp(-alpha * t) + B * np.exp(-beta * t)
+    except FileNotFoundError:
+        print(f"File {filename} not found.")
+        return None, None
+    except ValueError:
+        print(f"Error loading file {filename}. Please check the file format.")
+        return None, None
 
-# 绘制数据和模型
 def plot_data_and_model(t, viral_load, params):
     A, alpha, B, beta = params
-    model_load = HIV_model(t, A, alpha, B, beta)
+    model_load = HIV_model.viral_load(HIV_model(A, alpha, B, beta), t)
     plt.figure(figsize=(10, 6))
     plt.scatter(t, viral_load, label='Experimental Data', color='red', s=10)
     plt.plot(t, model_load, label='Fitted Model', color='blue')
@@ -38,7 +38,10 @@ def plot_data_and_model(t, viral_load, params):
 # 主函数
 def main():
     # 加载实验数据
-    t_data, viral_load_data = load_data('data/HIVseries.csv')
+    t_data, viral_load_data = load_hiv_data('data/HIVseries.csv')
+    
+    if t_data is None or viral_load_data is None:
+        return
     
     # 初始参数猜测
     params = [1000, 0.1, 500, 0.05]  # A, alpha, B, beta
