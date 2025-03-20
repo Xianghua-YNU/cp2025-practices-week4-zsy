@@ -1,136 +1,98 @@
-"""
-最小二乘拟合和光电效应实验
-"""
-
 import numpy as np
 import matplotlib.pyplot as plt
-from scipy.optimize import curve_fit
 
 def load_data(filename):
     """
     加载数据文件
-    
-    参数:
-        filename: 数据文件路径
-        
-    返回:
-        x: 频率数据数组
-        y: 电压数据数组
     """
-    # 在此处编写代码，读取数据文件
-    data = np.loadtxt(filename)
-    x = data[:, 0]
-    y = data[:, 1]
-    return x, y
+    try:
+        data = np.loadtxt(filename)
+        return data[:, 0], data[:, 1]
+    except Exception as e:
+        raise FileNotFoundError(f"无法加载文件：{filename}") from e
 
 def calculate_parameters(x, y):
     """
-    计算最小二乘拟合参数
-    
-    参数:
-        x: x坐标数组
-        y: y坐标数组
-        
-    返回:
-        m: 斜率
-        c: 截距
-        Ex: x的平均值
-        Ey: y的平均值
-        Exx: x^2的平均值
-        Exy: xy的平均值
+    计算输入x和y的参数
     """
-    # 在此处编写代码，计算Ex, Ey, Exx, Exy, m和c
+    if len(x) == 0 or len(y) == 0:
+        raise ValueError("输入数据不能为空")
+
+    n = len(y)
     Ex = np.mean(x)
     Ey = np.mean(y)
     Exx = np.mean(x**2)
+    Eyy = np.mean(y**2)
     Exy = np.mean(x * y)
-    m = (Exy - Ex * Ey / len(x)) / (Exx - Ex**2 / len(x))
-    c = Ey - m * Ex
+
+    denominator = Ex * Ex - n
+    if denominator == 0:
+        raise ValueError("无法计算参数，分母为零")
+
+    m = (Ey * Exx - Ex * Ey) / denominator
+    c = (Exx * Ey - Ex * Exy) / denominator
+
     return m, c, Ex, Ey, Exx, Exy
 
 def plot_data_and_fit(x, y, m, c):
     """
     绘制数据点和拟合直线
-    
-    参数:
-        x: x坐标数组
-        y: y坐标数组
-        m: 斜率
-        c: 截距
-    
-    返回:
-        fig: matplotlib图像对象
     """
-    # 在此处编写代码，绘制数据点和拟合直线
-    fig, ax = plt.subplots()
-    ax.scatter(x, y, label='Data')
-    ax.plot(x, m * x + c, 'r', label='Fit')
-    ax.set_title('Data and Fit')
-    ax.set_xlabel('x')
-    ax.set_ylabel('y')
-    ax.legend()
-    return fig
+    if np.isnan(m) or np.isnan(c):
+        raise ValueError("斜率和截距不能为NaN")
 
-def calculate_planck_constant(m):
+    fig, ax = plt.subplots()
+    ax.scatter(x, y, label="实验数据")
+    ax.plot(x, m * x + c, 'r', label="拟合直线")
+    ax.set_xlabel("频率 (ν)")
+    ax.set_ylabel("电压 (V)")
+    ax.set_title("Millikan光电效应拟合")
+    ax.legend()
+    plt.show()
+
+def calculate_planck_constant(m, e=1.602e-19):
     """
     计算普朗克常量
-    
-    参数:
-        m: 斜率
-        
-    返回:
-        h: 计算得到的普朗克常量值
-        relative_error: 与实际值的相对误差(%)
     """
-    # 电子电荷
-    e = 1.602e-19  # C
-    
-    # 在此处编写代码，计算普朗克常量和相对误差
-    # 提示: 实际的普朗克常量值为 6.626e-34 J·s
-    e = 1.602e-19  # C
-    h = e / m
-    actual_h = 6.626e-34  # J·s
-    relative_error = abs((h - actual_h) / actual_h) * 100
-    return h, relative_error
+    h = m * e
+    return h
 
 def main():
-    """主函数"""
-    # 数据文件路径
-    filename = "/workspaces/cp2025-practices-week4-zsy/data/millikan.txt"
-    
-    # 加载数据
-    x, y = load_data(filename)
-    
-    # 计算拟合参数
-    m, c, Ex, Ey, Exx, Exy = calculate_parameters(x, y)
-    
-    # 打印结果
-    print(f"Ex = {Ex:.6e}")
-    print(f"Ey = {Ey:.6e}")
-    print(f"Exx = {Exx:.6e}")
-    print(f"Exy = {Exy:.6e}")
-    print(f"斜率 m = {m:.6e}")
-    print(f"截距 c = {c:.6e}")
-    
-    # 绘制散点图
-    fig_data = plt.figure()
-    plt.scatter(x, y, label='Experimental Data', color='blue')
-    plt.xlabel('Frequency')
-    plt.ylabel('Voltage')
-    plt.title('Experimental Data Scatter Plot')
-    plt.legend()
-    plt.savefig("experimental_data.png", dpi=300)
-    plt.close(fig_data)
+    """
+    主函数
+    """
+    try:
+        # 数据文件路径
+        filename = "millikan.txt"
 
-    # 绘制拟合直线
-    fig_fit = plot_data_and_fit(x, y, m, c)
-    plt.savefig("fit_line.png", dpi=300)
-    plt.close(fig_fit)
+        # 加载数据
+        x, y = load_data(filename)
 
-    # 计算普朗克常量
-    h, relative_error = calculate_planck_constant(m)
-    print(f"计算得到的普朗克常量 h = {h:.6e} J·s")
-    print(f"与实际值的相对误差：{relative_error:.2f}%")
+        # 计算拟合参数
+        m, c, Ex, Ey, Exx, Exy = calculate_parameters(x, y)
+
+        # 打印结果
+        print(f"Ex = {Ex:.6e}")
+        print(f"Ey = {Ey:.6e}")
+        print(f"Exx = {Exx:.6e}")
+        print(f"Exy = {Exy:.6e}")
+        print(f"斜率 m = {m:.6e}")
+        print(f"截距 c = {c:.6e}")
+
+        # 绘制数据和拟合直线
+        fig = plot_data_and_fit(x, y, m, c)
+
+        # 计算普朗克常量
+        h, relative_error = calculate_plan_constantck(m)
+        print(f"计算得到的普朗克常量 h = {h:.6e} J·s")
+        print(f"与实际值的相对误差: {relative_error:.2f}%")
+
+        # 保存图像
+        plt.savefig("millikan_fit.png", dpi=300)
+        plt.close()
+
+    except Exception as e:
+        print(f"程序出错: {str(e)}")
 
 if __name__ == "__main__":
     main()
