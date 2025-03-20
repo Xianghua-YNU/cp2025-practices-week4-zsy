@@ -1,67 +1,67 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-# 定义逻辑斯蒂生长模型（Logistic模型）
-def logistic_model(t, K, P0, r):
-    """
-    Logistic生长模型
-    t: 时间
-    K: 最大承载量
-    P0: 初始细菌浓度
-    r: 增长率
-    """
-    return K / (1 + ((K - P0) / P0) * np.exp(-r * t))
+# 定义两个数学模型
+def V(t, tau):
+    return 1 - np.exp(-t / tau)
 
-# 读取数据
-def read_data(file_path):
-    data = np.genfromtxt(file_path, delimiter=',', skip_header=5)
-    return data[:, 0], data[:, 1]
-
-# 绘制实验数据图
-def plot_experiment_data(time, concentration, title, save_path):
-    plt.figure(figsize=(10, 6))
-    plt.scatter(time, concentration, label="experimental data", color="blue")
-    plt.title(title)
-    plt.xlabel("time (h)")
-    plt.ylabel("OD")
-    plt.legend()
-    plt.grid(True)
-    plt.savefig(save_path, dpi=300, bbox_inches='tight')
-    plt.show()
+def W(t, A, tau):
+    return A * (np.exp(-t / tau) - 1 + t / tau)
 
 # 绘制实验数据和模型拟合图
-def plot_data_and_fit(time, concentration, fit_params, title, save_path):
-    plt.figure(figsize=(10, 6))
-    plt.scatter(time, concentration, label="experimental data", color="blue")
-
-    # 使用拟合参数绘制模型曲线
-    c_fit = np.linspace(min(time), max(time), 100)
-    f_fit = logistic_model(c_fit, fit_params[0], fit_params[1], fit_params[2])
-
-    plt.plot(c_fit, f_fit, label="model fitting", color="red", linestyle="--")
-
+def plot_data_and_fit(t_data, data, model, params, title):
+    plt.figure(figsize=(8, 6))
+    plt.scatter(t_data, data, label='Experimental data', color='red', s=10)
+    t_fit = np.linspace(min(t_data), max(t_data), 300)
+    data_fit = model(t_fit, *params)
+    plt.plot(t_fit, data_fit, label='Fitted model', color='blue')
+    plt.xlabel('Time (t)')
+    plt.ylabel('OD')
     plt.title(title)
-    plt.xlabel("time (h)")
-    plt.ylabel("OD")
     plt.legend()
     plt.grid(True)
-
-    plt.savefig(save_path, dpi=300, bbox_inches='tight')
     plt.show()
 
-# 主程序
+# 主函数
+def main():
+    # 加载实验数据
+    v_data = np.loadtxt('data/g149novivkA.txt ')
+    w_data = np.loadtxt('data/g149novivkB.txt')
+    
+    # 假设V和W数据文件的第一列是时间数据，第二列是OD值
+    t_v_data = v_data[:, 0]
+    v_od_data = v_data[:, 1]
+    t_w_data = w_data[:, 0]
+    w_od_data = w_data[:, 1]
+    
+    # 绘制V(t)实验数据图
+    plt.figure(figsize=(8, 6))
+    plt.scatter(t_v_data, v_od_data, label='V(t) Experimental data', color='red', s=10)
+    plt.xlabel('Time (t)')
+    plt.ylabel('OD')
+    plt.title('V(t) Experimental Data')
+    plt.legend()
+    plt.grid(True)
+    plt.show()
+    
+    # 绘制W(t)实验数据图
+    plt.figure(figsize=(8, 6))
+    plt.scatter(t_w_data, w_od_data, label='W(t) Experimental data', color='red', s=10)
+    plt.xlabel('Time (t)')
+    plt.ylabel('OD')
+    plt.title('W(t) Experimental Data')
+    plt.legend()
+    plt.grid(True)
+    plt.show()
+    
+    # 绘制V(t)模型拟合图
+    plot_data_and_fit(t_v_data, v_od_data, V, [1], 'V(t) Model Fitting')
+    
+    # 绘制W(t)模型拟合图
+    plot_data_and_fit(t_w_data, w_od_data, W, [1, 1], 'W(t) Model Fitting')
+
 if __name__ == "__main__":
-    # 读取数据
-    time_V, concentration_V = read_data("data/g149novickA.txt")
-    time_N, concentration_N = read_data("data/g149novickB.txt")
-
-    # 拟合模型
-    fit_params_V = (100, 0.1, 0.5)  # 假设的拟合参数
-    fit_params_N = (100, 0.1, 0.5)  # 假设的拟合参数
-
-    # 绘制实验数据图
-    plot_experiment_data(time_V, concentration_V, "V.txt experimental data", "V_experiment_data.png")
-    plot_experiment_data(time_N, concentration_N, "N.txt experimental data", "N_experiment_data.png")
+    main()
 
     # 绘制数据和拟合图，并保存图片
     plot_data_and_fit(time_V, concentration_V, fit_params_V, "V.txt data fitting", "V_data_fit.png")
