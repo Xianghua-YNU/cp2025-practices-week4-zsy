@@ -1,15 +1,18 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-# 定义两个数学模型
-def V(t, tau):
-    return 1 - np.exp(-t / tau)
+class BacteriaModel:
+    def __init__(self, A=1.0, tau=2.0):
+        self.A = A
+        self.tau = tau
 
-def W(t, A, tau):
-    return A * (np.exp(-t / tau) - 1 + t / tau)
+    def v_model(self, t):
+        return 1 - np.exp(-t / self.tau)
 
-# 加载数据
-def load_data(filename):
+    def w_model(self, t):
+        return self.A * (np.exp(-t / self.tau) - 1 + t / self.tau)
+
+def load_bacteria_data(filename):
     data = np.loadtxt(filename)
     return data[:, 0], data[:, 1]
 
