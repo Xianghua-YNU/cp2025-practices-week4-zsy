@@ -23,6 +23,8 @@ def calculate_parameters(x, y):
     """
     if len(x) == 0 or len(y) == 0:
         raise ValueError("输入数据不能为空")
+    if len(x) != len(y):
+        raise ValueError("x和y数值长度必须相同")
 
     N = len(x)
     Ex = np.mean(x)
@@ -34,7 +36,7 @@ def calculate_parameters(x, y):
     if denominator == 0:
         raise ValueError("无法计算参数. 分母为零")
     m = (Exy - Ex*Ey) / denominator
-    c = (Exx*Ey - Ex*Exy) / denominator
+    c = Ey - m * Ex
 
     return m, c, Ex, Ey, Exx, Exy
 
@@ -69,7 +71,7 @@ def main():
     """
     try:
         # 数据文件路径
-        filename = "millikan.txt"
+        filename = "data/millikan.txt"
         # 加载数据
         x, y = load_data(filename)
         # 计算拟合参数
