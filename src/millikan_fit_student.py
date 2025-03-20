@@ -61,9 +61,7 @@ def calculate_planck_constant(m):
         raise ValueError("斜率必须为正数")
     e = 1.602e-19  # 电子电荷
     h = m * e
-    actual_h = 6.626e-34
-    relative_error = abs(h - actual_h) / actual_h * 100
-    return h, relative_error
+    return h
 
 def main():
     """
@@ -86,7 +84,9 @@ def main():
         # 绘制数据和拟合直线
         fig = plot_data_and_fit(x, y, m, c)
         # 计算普朗克常数
-        h, relative_error = calculate_planck_constant(m)
+        h = calculate_planck_constant(m)
+        actual_h = 6.626e-34
+        relative_error = abs(h - actual_h) / actual_h * 100
         print(f"计算得到的普朗克常数 h = {h:.6e} J.s")
         print(f"与实际值的相对误差: {relative_error:.2f}%")
         # 保存图像
@@ -94,9 +94,6 @@ def main():
         plt.show()
     except Exception as e:
         print(f"程序出错: {str(e)}")
-
-if __name__ == "__main__":
-    main()
 
 if __name__ == "__main__":
     main()
