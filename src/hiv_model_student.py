@@ -1,5 +1,4 @@
 import numpy as np
-import matplotlib.pyplot as plt
 
 class HIVModel:
     def __init__(self, A=1.0, alpha=0.1, B=0.5, beta=0.1):
@@ -13,7 +12,7 @@ class HIVModel:
 
 def load_hiv_data(filename):
     try:
-        data = np.loadtxt(filename)
+        data = np.loadtxt(filename, delimiter=',')
         return data[:, 0], data[:, 1]
     except FileNotFoundError:
         print(f"File {filename} not found.")
@@ -24,7 +23,7 @@ def load_hiv_data(filename):
 
 def plot_data_and_model(t, viral_load, params):
     A, alpha, B, beta = params
-    model_load = HIV_model.viral_load(HIV_model(A, alpha, B, beta), t)
+    model_load = HIVModel(A, alpha, B, beta).viral_load(t)
     plt.figure(figsize=(10, 6))
     plt.scatter(t, viral_load, label='Experimental Data', color='red', s=10)
     plt.plot(t, model_load, label='Fitted Model', color='blue')
@@ -41,6 +40,7 @@ def main():
     t_data, viral_load_data = load_hiv_data('data/HIVseries.csv')
     
     if t_data is None or viral_load_data is None:
+        print("Failed to load data.")
         return
     
     # 初始参数猜测
