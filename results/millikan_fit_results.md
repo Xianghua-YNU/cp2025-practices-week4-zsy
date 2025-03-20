@@ -2,11 +2,12 @@
 
 ## 数据散点图
 
-![数据散点图](path/to/scatter_plot.png)
+![数据散点图](/workspaces/cp2025-practices-week4-zsy/src/experimental_data.png)
+
 
 ## 拟合直线图
 
-![拟合直线图](path/to/fit_line.png)
+![拟合直线图](/workspaces/cp2025-practices-week4-zsy/src/fit_line.png)
 
 ## 计算结果
 
@@ -14,8 +15,14 @@
 - 截距 c: ...
 - 计算得到的普朗克常量 h: ...
 - 与实际值的相对误差: ...
+A：斜率 m = 2.132700e-15
+   截距 c = -1.174104e-01
+   计算得到的普朗克常量 h = 7.511607e-05 J·s
+   与实际值的相对误差：11336563104851666208173276004352.00%
 
 ## 分析与结论
 
 - 数据拟合的准确性。
+A：数据拟合存在较大偏差。
 - 普朗克常量的测量结果。
+A：6.62607015e−34 J⋅s
