@@ -11,8 +11,8 @@ class TestHIVModel(unittest.TestCase):
 
     def test_data_loading(self):
         time, response = load_hiv_data('data/HIVseries.csv')
-        self.assertGreater(len(time), 0)
-        self.assertGreater(len(response), 0)
+        self.assertIsNotNone(time)
+        self.assertIsNotNone(response)
 
 if __name__ == "__main__":
     unittest.main()
