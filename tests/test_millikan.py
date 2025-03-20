@@ -10,7 +10,7 @@ class TestMillikanFit(unittest.TestCase):
 
     def test_calculate_parameters(self):
         x = np.array([1, 2, 3, 4, 5])
-        y = np.array([2, 4, 6, 8, 10])
+        y = np.array([2, 4, 6, 8])
         m, c, Ex, Ey, Exx, Exy = calculate_parameters(x, y)
         self.assertAlmostEqual(m, 2.0)
         self.assertAlmostEqual(c, 0.0)
