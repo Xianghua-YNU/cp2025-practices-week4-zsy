@@ -1,6 +1,6 @@
 import unittest
 import numpy as np
-from src.millikan_fit import load_data, calculate_parameters, calculate_planck_constant
+from src.millikan_fit_student import load_data, calculate_parameters, calculate_planck_constant
 
 class TestMillikanFit(unittest.TestCase):
     def test_load_data(self):
