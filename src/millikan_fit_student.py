@@ -80,12 +80,11 @@ def main():
         print(f"截距 c = {c:.6e}")
 
         # 绘制数据和拟合直线
-        fig = plot_data_and_fit(x, y, m, c)
+        plot_data_and_fit(x, y, m, c)
 
         # 计算普朗克常量
-        h, relative_error = calculate_plan_constantck(m)
+        h = calculate_planck_constant(m)
         print(f"计算得到的普朗克常量 h = {h:.6e} J·s")
-        print(f"与实际值的相对误差: {relative_error:.2f}%")
 
         # 保存图像
         plt.savefig("millikan_fit.png", dpi=300)
