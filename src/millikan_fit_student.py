@@ -63,7 +63,7 @@ def main():
     """
     try:
         # 数据文件路径
-        filename = "millikan.txt"
+        filename = "data/millikan.txt"
 
         # 加载数据
         x, y = load_data(filename)
