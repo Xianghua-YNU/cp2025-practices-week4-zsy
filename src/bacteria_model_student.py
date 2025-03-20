@@ -54,8 +54,8 @@ def main():
     plot_models(A_values, tau_values)
     
     # 加载实验数据
-    t_v_data, v_od_data = load_data('v_data.txt')
-    t_w_data, w_od_data = load_data('w_data.txt')
+    t_v_data, v_od_data = load_data('data/g149novickA.txt')
+    t_w_data, w_od_data = load_data('data/g149novickB.txt')
     
     # 绘制V(t)实验数据图
     plt.figure(figsize=(8, 6))
