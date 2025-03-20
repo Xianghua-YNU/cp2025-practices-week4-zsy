@@ -13,7 +13,7 @@ class BacteriaModel:
         return self.A * (np.exp(-t / self.tau) - 1 + t / self.tau)
 
 def load_bacteria_data(filename):
-    data = np.loadtxt(filename)
+    data = np.loadtxt(filename, delimiter=',')
     return data[:, 0], data[:, 1]
 
 # 绘制模型曲线
