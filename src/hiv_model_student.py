@@ -1,63 +1,45 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from scipy.integrate import odeint
-class HIVModel:
-    def __init__(self, A, alpha, B, beta):
-        # TODO: 初始化模型参数
-        self.A = A  # 初始CD4+ T细胞数量
-        self.alpha = alpha  # T细胞自然死亡率
-        self.B = B  # 病毒清除率
-        self.beta = beta  # 病毒复制率
 
-    def viral_load(self, time):
-        # TODO: 计算病毒载量
-        T = self.A * np.exp(-self.alpha * time)
-        V = self.B * T * np.exp(self.beta * time) / (1 + np.exp(self.beta * time)**2)
-        return V
-        return np.zeros_like(time)
+# 定义HIV模型
+def HIV_model(t, A, alpha, B, beta):
+    return A * np.exp(-alpha * t) + B * np.exp(-beta * t)
 
-    def plot_model(self, time):
-        # TODO: 绘制模型曲线
-        V = self.viral_load(time)
-        plt.figure(figsize=(10, 6))
-        plt.plot(time, V, label='Viral Load')
-        plt.title('HIV Model')
-        plt.xlabel('Time (days)')
-        plt.ylabel('Viral Load')
-        plt.legend()
-        plt.grid(True)
-        plt.savefig("HIV Model", dpi=300)
-        plt.show()
+# 加载数据
+def load_data(filename):
+    data = np.loadtxt(filename, delimiter=',')
+    return data[:, 0], data[:, 1]
 
-def load_hiv_data(filepath):
-    # TODO: 加载HIV数据
-   data = np.loadtxt(filepath, delimiter=',')
-   time = data[:, 0]
-   viral_load = data[:, 1]
-   return time, viral_load
-   return np.array([]), np.array([])
-
-def main():
-    # TODO: 主函数，用于测试模型
-    model = HIVModel(A=1000, alpha=0.01, B=0.1, beta=0.5)
-    time = np.linspace(0, 200, 100)  # 模拟200天的数据
-    model.plot_model(time)
-    filepath = '/workspaces/cp2025-practices-week4-zsy/data/HIVseries.csv'  
-    time_data, viral_load_data = load_hiv_data(filepath)
-
-
-
-    # 绘制实验数据
+# 绘制数据和模型
+def plot_data_and_model(t, viral_load, params):
+    A, alpha, B, beta = params
+    model_load = HIV_model(t, A, alpha, B, beta)
     plt.figure(figsize=(10, 6))
-    plt.plot(time_data, viral_load_data, 'o', label='Experimental Data')
-    plt.plot(time, model.viral_load(time), '-', label='Model Prediction')
-    plt.title('HIV Model vs Experimental Data')
+    plt.scatter(t, viral_load, label='Experimental Data', color='red', s=10)
+    plt.plot(t, model_load, label='Fitted Model', color='blue')
     plt.xlabel('Time (days)')
     plt.ylabel('Viral Load')
+    plt.title('HIV Model Fitting')
     plt.legend()
     plt.grid(True)
-    plt.savefig("HIV Model vs Experimental Data", dpi=300)
     plt.show()
+
+# 主函数
+def main():
+    # 加载实验数据
+    t_data, viral_load_data = load_data('data/HIVseries.csv')
+    
+    # 初始参数猜测
+    params = [1000, 0.1, 500, 0.05]  # A, alpha, B, beta
+    
+    # 绘制数据和模型
+    plot_data_and_model(t_data, viral_load_data, params)
+
+    # 手动调整参数以获得更好的拟合
+    # 例如，调整alpha和beta以匹配数据的长期行为
+    params[1] = 0.05  # alpha
+    params[3] = 0.01  # beta
+    plot_data_and_model(t_data, viral_load_data, params)
 
 if __name__ == "__main__":
     main()
