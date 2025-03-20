@@ -1,7 +1,6 @@
 import unittest
 import numpy as np
 from src.bacteria_model_student import BacteriaModel, load_bacteria_data
-#from solutions.bacteria_model_solution import BacteriaModel, load_bacteria_data
 
 class TestBacteriaModel(unittest.TestCase):
     def test_v_model(self):
