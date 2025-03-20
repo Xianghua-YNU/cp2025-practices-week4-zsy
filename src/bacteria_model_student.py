@@ -57,3 +57,8 @@ def main():
 
 if __name__ == "__main__":
     main()
+try:
+    from scipy.optimize import curve_fit
+except ImportError:
+    print("Error: scipy module is not installed. Please install it using 'pip install scipy'.")
+    exit(1)
