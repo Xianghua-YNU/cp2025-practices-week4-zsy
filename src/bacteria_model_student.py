@@ -1,85 +1,68 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from scipy.optimize import curve_fit
 
-# 定义两个数学模型
-def V(t, tau):
-    return 1 - np.exp(-t / tau)
+# 定义逻辑斯蒂生长模型（Logistic模型）
+def logistic_model(t, K, P0, r):
+    """
+    Logistic生长模型
+    t: 时间
+    K: 最大承载量
+    P0: 初始细菌浓度
+    r: 增长率
+    """
+    return K / (1 + ((K - P0) / P0) * np.exp(-r * t))
 
-def W(t, A, tau):
-    return A * (np.exp(-t / tau) - 1 + t / tau)
+# 读取数据
+def read_data(file_path):
+    data = np.genfromtxt(file_path, delimiter=',', skip_header=5)
+    return data[:, 0], data[:, 1]
 
-# 绘制不同参数下的模型曲线
-def plot_models(A_values, tau_values):
-    t = np.linspace(0, 10, 400)
-    plt.figure(figsize=(12, 6))
-    
-    for A in A_values:
-        for tau in tau_values:
-            v = V(t, tau)
-            w = W(t, A, tau)
-            plt.plot(t, v, label=f'V(τ={tau})')
-            plt.plot(t, w, label=f'W(A={A}, τ={tau})')
-
-    plt.xlabel('Time (t)')
-    plt.ylabel('OD')
-    plt.title('Model Curves for Different Parameters')
-    plt.legend()
-    plt.grid(True)
-    plt.show()
-
-# 拟合实验数据
-def fit_data(t_data, data, model, initial_guess):
-    popt, _ = curve_fit(model, t_data, data, p0=initial_guess)
-    return popt
-
-# 绘制实验数据和拟合曲线
-def plot_data_and_fit(t_data, data, model, popt, title):
-    t_fit = np.linspace(min(t_data), max(t_data), 400)
-    data_fit = model(t_fit, *popt)
-    
-    plt.figure(figsize=(8, 6))
-    plt.scatter(t_data, data, label='Experimental data', color='red', s=10)
-    plt.plot(t_fit, data_fit, label='Fitted model', color='blue')
-    plt.xlabel('Time (t)')
-    plt.ylabel('OD')
+# 绘制实验数据图
+def plot_experiment_data(time, concentration, title, save_path):
+    plt.figure(figsize=(10, 6))
+    plt.scatter(time, concentration, label="experimental data", color="blue")
     plt.title(title)
+    plt.xlabel("time (h)")
+    plt.ylabel("OD")
     plt.legend()
     plt.grid(True)
+    plt.savefig(save_path, dpi=300, bbox_inches='tight')
     plt.show()
 
-# 主函数
-def main():
-    # 参数设置
-    A_values = [1, 2, 3]
-    tau_values = [1, 2, 3]
-    
-    # 绘制不同参数下的模型曲线
-    plot_models(A_values, tau_values)
-    
-    # 加载实验数据
-    v_data = np.loadtxt('https://www.physics.upenn.edu/biophys/PMLS/Datasets/15novick/g149novickA.txt')
-    w_data = np.loadtxt('https://www.physics.upenn.edu/biophys/PMLS/Datasets/15novick/g149novickB.txt')
-    
-    # 假设V和W数据文件的第一列是时间数据，第二列是OD值
-    t_v_data = v_data[:, 0]
-    v_od_data = v_data[:, 1]
-    t_w_data = w_data[:, 0]
-    w_od_data = w_data[:, 1]
-    
-    # 拟合V(t)模型
-    popt_v = fit_data(t_v_data, v_od_data, V, [1])  # 使用初始猜测参数
-    print(f"Fitted parameters for V(t): {popt_v}")
-    
-    # 绘制V(t)实验数据和拟合曲线
-    plot_data_and_fit(t_v_data, v_od_data, V, popt_v, 'V(t) Experimental Data and Fitted Curve')
-    
-    # 拟合W(t)模型
-    popt_w = fit_data(t_w_data, w_od_data, W, [1, 1])  # 使用初始猜测参数
-    print(f"Fitted parameters for W(t): {popt_w}")
-    
-    # 绘制W(t)实验数据和拟合曲线
-    plot_data_and_fit(t_w_data, w_od_data, W, popt_w, 'W(t) Experimental Data and Fitted Curve')
+# 绘制实验数据和模型拟合图
+def plot_data_and_fit(time, concentration, fit_params, title, save_path):
+    plt.figure(figsize=(10, 6))
+    plt.scatter(time, concentration, label="experimental data", color="blue")
 
+    # 使用拟合参数绘制模型曲线
+    c_fit = np.linspace(min(time), max(time), 100)
+    f_fit = logistic_model(c_fit, fit_params[0], fit_params[1], fit_params[2])
+
+    plt.plot(c_fit, f_fit, label="model fitting", color="red", linestyle="--")
+
+    plt.title(title)
+    plt.xlabel("time (h)")
+    plt.ylabel("OD")
+    plt.legend()
+    plt.grid(True)
+
+    plt.savefig(save_path, dpi=300, bbox_inches='tight')
+    plt.show()
+
+# 主程序
 if __name__ == "__main__":
-    main()
+    # 读取数据
+    time_V, concentration_V = read_data("/workspaces/cp2025-practices-week2-zy/data/9149noviKA.txt")
+    time_N, concentration_N = read_data("/workspaces/cp2025-practices-week2-zy/data/9149noviKs.txt")
+
+    # 拟合模型
+    fit_params_V = (100, 0.1, 0.5)  # 假设的拟合参数
+    fit_params_N = (100, 0.1, 0.5)  # 假设的拟合参数
+
+    # 绘制实验数据图
+    plot_experiment_data(time_V, concentration_V, "V.txt experimental data", "V_experiment_data.png")
+    plot_experiment_data(time_N, concentration_N, "N.txt experimental data", "N_experiment_data.png")
+
+    # 绘制数据和拟合图，并保存图片
+    plot_data_and_fit(time_V, concentration_V, fit_params_V, "V.txt data fitting", "V_data_fit.png")
+    plot_data_and_fit(time_N, concentration_N, fit_params_N, "N.txt data fitting", "N_data_fit.png")
