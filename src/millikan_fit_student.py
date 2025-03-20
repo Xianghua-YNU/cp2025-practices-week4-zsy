@@ -7,7 +7,13 @@ def load_data(filename):
     """
     try:
         data = np.loadtxt(filename)
-        return data[:, 0], data[:, 1]
+        if data.shape[1] != 2:
+            raise ValueError("数据文件格式不正确，必须包含两列数据")
+        x = data[:, 0]
+        y = data[:, 1]
+        if len(x) != len(y):
+            raise ValueError("x和y数值长度必须相同")
+        return x, y
     except Exception as e:
         raise FileNotFoundError(f"无法加载文件: {filename}") from e
 
@@ -17,8 +23,6 @@ def calculate_parameters(x, y):
     """
     if len(x) == 0 or len(y) == 0:
         raise ValueError("输入数据不能为空")
-    if len(x) != len(y):
-        raise ValueError("x和y数值长度必须相同")
 
     N = len(x)
     Ex = np.mean(x)
@@ -59,7 +63,7 @@ def calculate_planck_constant(m):
     h = m * e
     actual_h = 6.626e-34
     relative_error = abs(h - actual_h) / actual_h * 100
-    return h  # 只返回普朗克常数，不返回相对误差
+    return h, relative_error
 
 def main():
     """
@@ -82,13 +86,17 @@ def main():
         # 绘制数据和拟合直线
         fig = plot_data_and_fit(x, y, m, c)
         # 计算普朗克常数
-        h = calculate_planck_constant(m)
+        h, relative_error = calculate_planck_constant(m)
         print(f"计算得到的普朗克常数 h = {h:.6e} J.s")
+        print(f"与实际值的相对误差: {relative_error:.2f}%")
         # 保存图像
         fig.savefig("millikan_fit.png", dpi=300)
         plt.show()
     except Exception as e:
         print(f"程序出错: {str(e)}")
+
+if __name__ == "__main__":
+    main()
 
 if __name__ == "__main__":
     main()
