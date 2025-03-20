@@ -52,8 +52,8 @@ def plot_data_and_fit(time, concentration, fit_params, title, save_path):
 # 主程序
 if __name__ == "__main__":
     # 读取数据
-    time_V, concentration_V = read_data("/workspaces/cp2025-practices-week2-zy/data/9149noviKA.txt")
-    time_N, concentration_N = read_data("/workspaces/cp2025-practices-week2-zy/data/9149noviKs.txt")
+    time_V, concentration_V = read_data("data/g149novickA.txt")
+    time_N, concentration_N = read_data("data/g149novickB.txt")
 
     # 拟合模型
     fit_params_V = (100, 0.1, 0.5)  # 假设的拟合参数
