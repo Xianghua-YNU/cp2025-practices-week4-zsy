@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import unittest
 
 # 定义两个数学模型
 def V(t, tau):
@@ -7,6 +8,30 @@ def V(t, tau):
 
 def W(t, A, tau):
     return A * (np.exp(-t / tau) - 1 + t / tau)
+
+# 绘制不同参数下的模型曲线
+def plot_models(A_values, tau_values):
+    t = np.linspace(0, 10, 400)
+    plt.figure(figsize=(12, 6))
+    
+    for A in A_values:
+        for tau in tau_values:
+            v = V(t, tau)
+            w = W(t, A, tau)
+            plt.plot(t, v, label=f'V(τ={tau})')
+            plt.plot(t, w, label=f'W(A={A}, τ={tau})')
+
+    plt.xlabel('Time (t)')
+    plt.ylabel('OD')
+    plt.title('Model Curves for Different Parameters')
+    plt.legend()
+    plt.grid(True)
+    plt.show()
+
+# 加载实验数据
+def load_bacteria_data(path):
+    data = np.loadtxt(path, delimiter=',')
+    return data[:, 0], data[:, 1]
 
 # 绘制实验数据和模型拟合图
 def plot_data_and_fit(t_data, data, model, params, title):
@@ -22,17 +47,36 @@ def plot_data_and_fit(t_data, data, model, params, title):
     plt.grid(True)
     plt.show()
 
-# 主函数
-def main():
-    # 加载实验数据
-    v_data = np.loadtxt('data/g149novivkA.txt ')
-    w_data = np.loadtxt('data/g149novivkB.txt')
+# 测试类
+class TestBacteriaModel(unittest.TestCase):
+    def test_v_model(self):
+        model = V
+        t = np.linspace(0, 10, 100)
+        result = model(t, 2.0)
+        self.assertEqual(len(result), 100)
+
+    def test_w_model(self):
+        model = W
+        t = np.linspace(0, 10, 100)
+        result = model(t, 1.0, 2.0)
+        self.assertEqual(len(result), 100)
+
+    def test_data_loading(self):
+        time, response = load_bacteria_data('data/g149novickA.txt')
+        self.assertGreater(len(time), 0)
+        self.assertGreater(len(response), 0)
+
+if __name__ == "__main__":
+    # 参数设置
+    A_values = [1, 2, 3]
+    tau_values = [1, 2, 3]
     
-    # 假设V和W数据文件的第一列是时间数据，第二列是OD值
-    t_v_data = v_data[:, 0]
-    v_od_data = v_data[:, 1]
-    t_w_data = w_data[:, 0]
-    w_od_data = w_data[:, 1]
+    # 绘制不同参数下的模型曲线
+    plot_models(A_values, tau_values)
+    
+    # 加载实验数据
+    t_v_data, v_od_data = load_bacteria_data('data/g149novickA.txt')
+    t_w_data, w_od_data = load_bacteria_data('data/g149novickBA.txt')
     
     # 绘制V(t)实验数据图
     plt.figure(figsize=(8, 6))
@@ -55,14 +99,10 @@ def main():
     plt.show()
     
     # 绘制V(t)模型拟合图
-    plot_data_and_fit(t_v_data, v_od_data, V, [1], 'V(t) Model Fitting')
+    plot_data_and_fit(t_v_data, v_od_data, V, [2.0], 'V(t) Model Fitting')
     
     # 绘制W(t)模型拟合图
-    plot_data_and_fit(t_w_data, w_od_data, W, [1, 1], 'W(t) Model Fitting')
-
-if __name__ == "__main__":
-    main()
-
-    # 绘制数据和拟合图，并保存图片
-    plot_data_and_fit(time_V, concentration_V, fit_params_V, "V.txt data fitting", "V_data_fit.png")
-    plot_data_and_fit(time_N, concentration_N, fit_params_N, "N.txt data fitting", "N_data_fit.png")
+    plot_data_and_fit(t_w_data, w_od_data, W, [1.0, 2.0], 'W(t) Model Fitting')
+    
+    # 运行测试
+    unittest.main(argv=[''], exit=False)
