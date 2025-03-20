@@ -1,14 +1,25 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
+class HIVModel:
+    def __init__(self, A=1.0, alpha=0.1, B=0.5, beta=0.1):
+        self.A = A
+        self.alpha = alpha
+        self.B = B
+        self.beta = beta
+
+    def viral_load(self, time):
+        return self.A * np.exp(-self.alpha * time) + self.B * np.exp(-self.beta * time)
+
+def load_hiv_data(filename):
+    try:
+        data = np.loadtxt(filename)
+        return data[:, 0], data[:, 1]
+    except:
+        return np.loadtxt(filenamepath, delimiter=',', unpack=False)
 # 定义HIV模型
 def HIV_model(t, A, alpha, B, beta):
     return A * np.exp(-alpha * t) + B * np.exp(-beta * t)
-
-# 加载数据
-def load_data(filename):
-    data = np.loadtxt(filename, delimiter=',')
-    return data[:, 0], data[:, 1]
 
 # 绘制数据和模型
 def plot_data_and_model(t, viral_load, params):
